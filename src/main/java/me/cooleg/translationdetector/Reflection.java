@@ -1,7 +1,6 @@
 package me.cooleg.translationdetector;
 
 import org.apache.logging.log4j.Level;
-import org.apache.logging.log4j.LogManager;
 import org.bukkit.Bukkit;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
@@ -25,7 +24,7 @@ public class Reflection {
 
                 for (int i = 0; i < fields.length; i++) {
                     if (fields[i].get(null) == value) {
-                        LogManager.getLogger(TranslationDetector.class).log(Level.INFO, "Spigot mapped anvil inventory ID: " + i);
+                        TranslationDetector.LOGGER.log(Level.INFO, "Spigot mapped anvil inventory ID: " + i);
                         return i;
                     }
                 }
@@ -36,14 +35,14 @@ public class Reflection {
 
                 for (int i = 0; i < fields.length; i++) {
                     if (fields[i].get(null) == value) {
-                        LogManager.getLogger(TranslationDetector.class).log(Level.INFO, "Mojang mapped anvil inventory ID: " + i);
+                        TranslationDetector.LOGGER.log(Level.INFO, "Mojang mapped anvil inventory ID: " + i);
                         return i;
                     }
                 }
             } catch (Exception ignored) {}
         } catch (Exception ignored) {}
 
-        LogManager.getLogger(TranslationDetector.class).log(Level.ERROR, "No anvil inventory ID could be found. Falling back to 8 (1.20.3+).");
+        TranslationDetector.LOGGER.log(Level.ERROR, "No anvil inventory ID could be found. Falling back to 8 (1.20.3+).");
         return 8;
     }
 

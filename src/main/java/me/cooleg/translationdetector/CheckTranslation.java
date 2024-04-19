@@ -9,12 +9,12 @@ import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
 import com.github.retrooper.packetevents.protocol.nbt.NBTString;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.User;
-import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientClickWindow;
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientNameItem;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerCloseWindow;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerOpenWindow;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerWindowItems;
 import net.kyori.adventure.text.Component;
+import org.apache.logging.log4j.Level;
 import org.bukkit.entity.Player;
 
 import java.util.*;
@@ -85,25 +85,18 @@ public class CheckTranslation implements PacketListener {
 
     @Override
     public void onPacketReceive(PacketReceiveEvent event) {
-        if (event.getPacketType() != PacketType.Play.Client.NAME_ITEM) {
-            if (event.getPacketType() == PacketType.Play.Client.CLICK_WINDOW) {
-                WrapperPlayClientClickWindow packet = new WrapperPlayClientClickWindow(event);
-                System.out.println(packet.getSlot());
-            }
-            return;
-        }
+        if (event.getPacketType() != PacketType.Play.Client.NAME_ITEM) return;
 
         User user = event.getUser();
         UUID uuid = user.getUUID();
         WrapperPlayClientNameItem nameItem = new WrapperPlayClientNameItem(event);
         String name = nameItem.getItemName();
-        System.out.println(name);
 
         if (awaitingGoodTranslation.contains(uuid)) {
             if (Config.goodTranslations.contains(name)) {
                 user.closeConnection();
 
-                System.out.println("Good translation kick");
+                TranslationDetector.LOGGER.log(Level.INFO, "User disconnected for not translating: " + name);
                 removePlayer(user);
                 return;
             }
@@ -113,7 +106,7 @@ public class CheckTranslation implements PacketListener {
             if (!Config.badTranslations.contains(name)) {
                 user.closeConnection();
 
-                System.out.println("Bad translation kick");
+                TranslationDetector.LOGGER.log(Level.INFO, "User disconnected for translating: " + name);
                 removePlayer(user);
                 return;
             }
