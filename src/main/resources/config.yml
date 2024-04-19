@@ -1,0 +1,6 @@
+# Translations that should not exist to the client. These translation keys should correspond to banned mods.
+bad-translations: []
+
+# Translations that are expected to be available to the client.
+# Assumes that if they aren't, the player is blocking this detection method.
+good-translations: []

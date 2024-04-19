@@ -1,0 +1,6 @@
+name: TranslationDetector
+version: '${project.version}'
+main: me.cooleg.translationdetector.TranslationDetector
+api-version: '1.20'
+depend:
+  - packetevents
