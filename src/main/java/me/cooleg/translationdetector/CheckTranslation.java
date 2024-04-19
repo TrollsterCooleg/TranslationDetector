@@ -22,7 +22,8 @@ import java.util.*;
 public class CheckTranslation implements PacketListener {
 
     private static final int WINDOW_ID = 239;
-    private static final WrapperPlayServerOpenWindow openWindow = new WrapperPlayServerOpenWindow(WINDOW_ID, 7, Component.text("Repair & Name"));
+    private static final int ANVIL_ID = Reflection.getAnvilId();
+    private static final WrapperPlayServerOpenWindow openWindow = new WrapperPlayServerOpenWindow(WINDOW_ID, ANVIL_ID, Component.text("Repair & Name"));
     private static final WrapperPlayServerCloseWindow closeWindow = new WrapperPlayServerCloseWindow(WINDOW_ID);
 
     private static final HashMap<UUID, List<String>> goodTranslationsToCheck = new HashMap<>();
