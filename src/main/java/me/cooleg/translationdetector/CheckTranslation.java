@@ -31,6 +31,7 @@ public class CheckTranslation implements PacketListener {
 
     private static final HashSet<UUID> awaitingBadTranslation = new HashSet<>();
     private static final HashSet<UUID> awaitingGoodTranslation = new HashSet<>();
+    private static final HashSet<UUID> awaitingTranslationTest = new HashSet<>();
 
     public static void addToQueue(Player player, List<String> translations, boolean badTranslations) {
         if (translations.isEmpty()) return;
@@ -83,6 +84,25 @@ public class CheckTranslation implements PacketListener {
         else awaitingGoodTranslation.add(user.getUUID());
     }
 
+    public static void fetchPlayer(Player player, String translation) {
+        TranslationDetector.LOGGER.log(Level.INFO, "Checking translation " + translation + " for " + player.getName());
+
+        User user = PacketEvents.getAPI().getPlayerManager().getUser(player);
+        user.sendPacket(openWindow);
+
+        NBTCompound nbt = new NBTCompound();
+        nbt.setTag("display", new NBTCompound());
+        nbt.getCompoundTagOrNull("display").setTag("Name", new NBTString("{\"translate\":\"" + translation + "\"}"));
+        ItemStack stack = ItemStack.builder().type(ItemTypes.IRON_SWORD).amount(1).nbt(nbt).build();
+
+        WrapperPlayServerWindowItems setSlot = new WrapperPlayServerWindowItems(WINDOW_ID, 1, List.of(stack), stack);
+        user.sendPacket(setSlot);
+
+        user.sendPacket(closeWindow);
+
+        awaitingTranslationTest.add(user.getUUID());
+    }
+
     @Override
     public void onPacketReceive(PacketReceiveEvent event) {
         if (event.getPacketType() != PacketType.Play.Client.NAME_ITEM) return;
@@ -92,7 +112,10 @@ public class CheckTranslation implements PacketListener {
         WrapperPlayClientNameItem nameItem = new WrapperPlayClientNameItem(event);
         String name = nameItem.getItemName();
 
-        if (awaitingGoodTranslation.contains(uuid)) {
+        if (awaitingTranslationTest.contains(uuid)) {
+            TranslationDetector.LOGGER.log(Level.INFO, "Result: " + name);
+            awaitingTranslationTest.remove(uuid);
+        } else if (awaitingGoodTranslation.contains(uuid)) {
             if (Config.goodTranslations.contains(name)) {
                 user.closeConnection();
 
@@ -140,6 +163,7 @@ public class CheckTranslation implements PacketListener {
 
         awaitingGoodTranslation.remove(uuid);
         awaitingBadTranslation.remove(uuid);
+        awaitingTranslationTest.remove(uuid);
     }
 
     public static void removePlayer(Player player) {

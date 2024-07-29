@@ -19,6 +19,8 @@ public final class TranslationDetector extends JavaPlugin {
 
         Bukkit.getPluginManager().registerEvents(new JoinLeaveListeners(this), this);
         PacketEvents.getAPI().getEventManager().registerListener(new CheckTranslation(), PacketListenerPriority.LOW);
+
+        getCommand("testtranslations").setExecutor(new TestTranslationCommand());
     }
 
 }

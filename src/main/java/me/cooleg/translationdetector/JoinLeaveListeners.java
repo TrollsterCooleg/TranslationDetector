@@ -17,6 +17,8 @@ public class JoinLeaveListeners implements Listener {
 
     @EventHandler
     public void playerJoin(PlayerJoinEvent event) {
+        if (event.getPlayer().hasPermission("translationdetector.bypass")) return;
+
         CheckTranslation.addToQueue(event.getPlayer(), new ArrayList<>(Config.goodTranslations), false);
         CheckTranslation.addToQueue(event.getPlayer(), new ArrayList<>(Config.badTranslations), true);
         CheckTranslation.runQueue(event.getPlayer());
